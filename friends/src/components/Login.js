@@ -1,4 +1,6 @@
 import React from 'react';
+import Loader from 'react-loader-spinner';
+import '../App.css';
 import { axiosWithAuth } from '../utils/axiosWithAuth';
 
 class Login extends React.Component {
@@ -6,8 +8,16 @@ class Login extends React.Component {
     credentials: {
       username: '',
       password: ''
-    }
+    },
+    isLoggedIn: false
   }
+
+  componentDidMount() {
+    if (localStorage.getItem('token')) {
+      this.setState({...this.state, isLoggedIn: true});
+  } else {
+      this.setState({...this.state, isLoggedIn: false });
+  }}
 
   handleChanges = e => {
     this.setState({
@@ -24,7 +34,8 @@ class Login extends React.Component {
       .post('/login', this.state.credentials)
       .then(res => {
         localStorage.setItem('token', res.data.payload);
-        this.props.history.push('/protected');
+        this.props.history.push('/friendlist');
+        this.setState({...this.state, isLoggedIn: true});
       })
       .catch(err => console.log(err))
   };
@@ -32,6 +43,12 @@ class Login extends React.Component {
   render () {
     return (
       <div>
+        {this.props.fetchingData && (
+          <div className="key spinner">
+            <Loader type="Puff" color="#204963" height="60" width="60" />
+            <p>Loading...</p>
+          </div>
+        )}
         <form onSubmit={this.login}>
           <input 
             type="text"
@@ -41,7 +58,7 @@ class Login extends React.Component {
             onChange={this.handleChanges}
           />
           <input 
-            type="text"
+            type="password"
             name="password"
             placeholder="Password"
             value={this.state.credentials.password}

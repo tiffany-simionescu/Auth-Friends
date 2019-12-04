@@ -1,35 +1,52 @@
-import React from 'react';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
 import Loader from 'react-loader-spinner';
-
+import AddFriend from './AddFriend';
+import Friend from './Friend';
 import { axiosWithAuth } from '../utils/axiosWithAuth';
 
-class FriendList extends React.Component {
-  state = {
-    // Add State
-  }
+const FriendList = () => {
 
-  componentDidMount() {
-    this.getFriends();
-  }
+  const [friends, setFriends] = useState([]);
 
-  getFriends = () => {
+  useEffect(() => {
     axiosWithAuth()
       .get('/friends')
       .then(res => {
-        this.setState({
-          // Add State
-        })
+        setFriends(res.data)
       })
       .catch(err => console.log(err));
-  }
+  })
 
-  render() {
+  const deleteFriend = (id) => {
+    axiosWithAuth()
+      .delete(`/friends/${id}`)
+      .then(res => {
+        console.log(res.data);
+        setFriends(res.data);
+      })
+      .catch(err => console.log(err));
+  };
+
     return (
       <div>
-        <h1>Friend List</h1>
-        {/* Display Friend Data Here */}
+        <h1 className="title">Friend List</h1>
+        <AddFriend />
+        <div className="friend-list">
+          {friends.length > 0 ? 
+            (friends.map(friend => {
+              return (
+                <div>
+                  <Friend {...friend} key={friend.id} />
+                  <button onClick={() => deleteFriend(friend.id)} className="button">
+                    Delete Friend
+                  </button>
+                </div>
+            )})) : (
+              <Loader type="Puff" className="loader" />
+            )}
+        </div>
       </div>
     )
   }
-}
+
+export default FriendList;
