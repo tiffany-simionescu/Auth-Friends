@@ -43,6 +43,7 @@ class Login extends React.Component {
   render () {
     return (
       <div>
+        <h1>Log In</h1>
         {this.props.fetchingData && (
           <div className="key spinner">
             <Loader type="Puff" color="#204963" height="60" width="60" />
